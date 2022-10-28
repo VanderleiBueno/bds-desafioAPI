@@ -1,6 +1,7 @@
 import axios from 'axios';
 import ResultCard from 'components/ResultCard';
 import { useState } from 'react';
+import CardLoader from './CardLoader';
 import './styles.css';
 
 type FormData = {
@@ -17,6 +18,7 @@ type GitData = {
 
 const GitSearch = () => {
   const [gitdata, setGitData] = useState<GitData>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     git: '',
@@ -32,6 +34,7 @@ const GitSearch = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    setIsLoading(true);
     axios
       .get(`https://api.github.com/users/${formData.git}`)
       .then((response) => {
@@ -39,6 +42,9 @@ const GitSearch = () => {
       })
       .catch((error) => {
         setGitData(undefined);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -67,7 +73,8 @@ const GitSearch = () => {
 
       <div className="img-result-container">
         <div className="container result-container">
-          {gitdata && (
+          {isLoading ? <CardLoader /> : (
+            gitdata && (
             <>
               <div className="box-container">
                 <div className="img-container">
@@ -90,7 +97,7 @@ const GitSearch = () => {
                 </div>
               </div>
             </>
-          )}
+          ))}
         </div>
       </div>
     </>
